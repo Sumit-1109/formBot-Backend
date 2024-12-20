@@ -15,6 +15,10 @@ app.use(express.urlencoded({extended: true}));
 const PORT = process.env.PORT || 8000;
 const connectDB = require('./connectDB/connectDB');
 
+const userRoutes = require('./routes/user.route');
+
+
+app.use('/api/user', userRoutes);
 
 
 
