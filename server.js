@@ -16,9 +16,11 @@ const PORT = process.env.PORT || 8000;
 const connectDB = require('./connectDB/connectDB');
 
 const userRoutes = require('./routes/user.route');
+const workSpaceRoutes = require('./routes/workspace.route');
 
 
 app.use('/api/user', userRoutes);
+app.use('/api/workspace', workSpaceRoutes);
 
 
 
