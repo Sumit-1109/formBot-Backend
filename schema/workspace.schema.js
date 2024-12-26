@@ -8,12 +8,12 @@ const workspaceSchema = new mongoose.Schema({
     owner:{
         type: mongoose.Schema.Types.ObjectId, 
         ref: "User",
-        required: true
+        required: true,
+        unique: true
     },
     ownerEmail:{
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     folders: [
         {
@@ -31,8 +31,14 @@ const workspaceSchema = new mongoose.Schema({
     ],
     forms : [
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Form'
+            formName: {
+                type: String,
+                required: true
+            },
+            form: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Form'
+            }
         }
     ],
     collaborators: [
