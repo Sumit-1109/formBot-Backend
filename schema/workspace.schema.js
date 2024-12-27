@@ -9,7 +9,6 @@ const workspaceSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: "User",
         required: true,
-        unique: true
     },
     ownerEmail:{
         type: String,
@@ -23,10 +22,16 @@ const workspaceSchema = new mongoose.Schema({
             },
             forms:[
                 {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: 'Form'
+                    formName: {
+                        type: String,
+                        required: true
+                    },
+                    form: {
+                        type: mongoose.Schema.Types.ObjectId,
+                        ref: 'Form'
+                    }
                 }
-            ]
+            ],
         }
     ],
     forms : [
