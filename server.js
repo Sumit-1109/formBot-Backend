@@ -16,11 +16,20 @@ const PORT = process.env.PORT || 8000;
 const connectDB = require('./connectDB/connectDB');
 
 const userRoutes = require('./routes/user.route');
-const workSpaceRoutes = require('./routes/workspace.route');
+const dashBoardRoutes = require('./routes/dashBoard.route')
+const workspaceRoutes = require('./routes/workspace.route');
+const folderRoutes = require('./routes/folder.route');
+const fileRoutes = require('./routes/file.route');
+const formRoutes = require('./routes/form.route');
+
 
 
 app.use('/api/user', userRoutes);
-app.use('/api/workspace', workSpaceRoutes);
+app.use('/api/dashboard', dashBoardRoutes);
+app.use('/api/folder', folderRoutes);
+app.use('/api/file', fileRoutes);
+app.use('/api/workspace', workspaceRoutes);
+app.use('/api/form', formRoutes);
 
 
 

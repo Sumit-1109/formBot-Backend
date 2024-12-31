@@ -9,7 +9,7 @@ const {auth, blackListedTokens} = require('../middlewares/auth');
 dotenv.config();
 
 const User = require("../schema/user.schema");
-const WorkSpace = require("../schema/workspace.schema");
+const Dashboard = require("../schema/dashBoard.schema");
 
 router.post('/signup', async (req, res) => {
     const {userName, email, password, confirmPassword} = req.body;
@@ -29,10 +29,6 @@ router.post('/signup', async (req, res) => {
         return res.status(400).json({field: "email", message: "Invalid email address"});
     }
 
-    const userNameRegex = /^[a-zA-Z\s\.\'\-]+$/;
-    if (!userNameRegex.test(trimmedUserName)){
-        return res.status(400).json({field: "userName", message: "No special characters"})
-    }
     if(trimmedUserName.length < 3){
         return res.status(400).json({field: 'userName', message: 'Atleast 3 characters long'});
     }
@@ -72,10 +68,9 @@ router.post('/signup', async (req, res) => {
             password: hashedPassword
         }], {session});
 
-        const workspace = await WorkSpace.create([{
-            name: `${trimmedUserName}'s Workspace`,
-            owner: user._id,
-            ownerEmail: trimmedEmail
+        const dashBoard = await Dashboard.create([{
+            name: `${trimmedUserName}'s workspace`,
+            owner: user._id
         }], {session});
 
         await session.commitTransaction();
@@ -199,11 +194,6 @@ router.put('/modify', auth, async (req,res) => {
     }
 
 
-    const userNameRegex = /^[a-zA-Z\s\.\'\-]+$/;
-    if (userName && (!userNameRegex.test(trimmedUserName))){
-        return res.status(400).json({field: "userName", message: "No special characters"})
-    }
-
     if (newPassword && (trimmedNewPassword.length < 4)) {
         return res.status(400).json({field: "password", message: "At least 4 characters"});
     }
@@ -257,19 +247,19 @@ router.put('/modify', auth, async (req,res) => {
         if (trimmedUserName) {
             user.userName = trimmedUserName;
 
-            const workspace = await WorkSpace.findOne({owner: id});
-            if(workspace) {
-                workspace.name = `${trimmedUserName}'s Workspace`;
-                await workspace.save();
+            const dashBoard = await Dashboard.findOne({owner: id});
+            if(dashBoard) {
+                dashBoard.name = `${trimmedUserName}'s workspace`;
+                await dashBoard.save();
             }
         };
         if (trimmedEmail) {
             user.email = trimmedEmail;
 
-            const workspace = await WorkSpace.findOne({owner: id});
-            if(workspace) {
-                workspace.ownerEmail = trimmedEmail;
-                await workspace.save();
+            const dashBoard = await Dashboard.findOne({owner: id});
+            if(dashBoard) {
+                dashBoard.ownerEmail = trimmedEmail;
+                await dashBoard.save();
             }
         };
         if (trimmedNewPassword){
