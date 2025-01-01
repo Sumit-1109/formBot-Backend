@@ -18,9 +18,7 @@ router.get("/", auth, async (req, res) => {
       return res.status(400).json({ message: "User ID is not valid" });
     }
 
-    const dashBoard = await Dashboard.findOne({ owner: req.user.id })
-      .populate("folders")
-      .populate("files");
+    const dashBoard = await Dashboard.findOne({ owner: req.user.id }).populate("folders").populate("files");
 
     if (!dashBoard) {
       return res.status(404).json({ message: "No Dashboard found" });

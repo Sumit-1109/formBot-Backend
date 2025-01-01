@@ -6,7 +6,6 @@ const { auth } = require("../middlewares/auth");
 
 const Dashboard = require ('../schema/dashBoard.schema');
 const Folder = require('../schema/folder.schema');
-const User = require('../schema/user.schema');
 const { default: mongoose } = require("mongoose");
 
 router.get("/:dashBoardId/folder/:folderId", auth, async (req, res) => {
@@ -21,8 +20,7 @@ router.get("/:dashBoardId/folder/:folderId", auth, async (req, res) => {
       return res.status(400).json({ message: "Dashboard not found" });
     }
 
-    const folder = await Folder.findById(folderId)
-    .populate("files");
+    const folder = await Folder.findById(folderId).populate("files");
 
     if (!folder || folder.dashBoard.toString() !== dashBoardId) {
       return res.status(400).json({ message: "Folder not found" });
@@ -120,7 +118,7 @@ router.delete("/:dashBoardId/folder/:folderId", auth, async(req, res) => {
         await Folder.findByIdAndDelete(folderId);
         
 
-        const dashBoard = await Dashboard.findById(dashBoardId);
+        const dashBoard = await Dashboard.findById(dashBoardId).populate('folders').populate('files');
         
     if (dashBoard) {
       dashBoard.folders = dashBoard.folders.filter(

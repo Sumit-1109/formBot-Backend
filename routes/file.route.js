@@ -93,7 +93,7 @@ router.post(
         return res.status(404).json({ message: "Dashboard not found!" });
       }
 
-      const folder = await Folder.findById(folderId);
+      const folder = await Folder.findById(folderId).populate('files');
 
       if (!folder || folder.dashBoard.toString() !== dashBoardId) {
         return res.status(404).json({ message: "Folder not found" });
@@ -102,6 +102,7 @@ router.post(
       const doesFileExist = await File.findOne({
         name: fileName,
         folder: folderId,
+        dashBoard: dashBoardId
       });
 
       if(doesFileExist) {
@@ -120,9 +121,13 @@ router.post(
       folder.files.push(file._id);
       await folder.save();
 
+      const updatedFolder = await Folder.findById(folderId).populate('files');
+
+
       return res.status(201).json({
         message: "Form created successfully",
         file,
+        folder: updatedFolder,
       });
     } catch (err) {
       console.log(err);
@@ -148,6 +153,7 @@ router.get("/:dashboardId/folder/:folderId/files", auth, async (req,res) => {
 
     try{
         const files = await File.find({dashBoard: dashboardId, folder: folderId});
+
         return res.status(200).json({files});
     } catch (err) {
       console.log(err);
@@ -167,7 +173,7 @@ router.delete('/:dashBoardId/file/:fileId', auth, async (req, res) => {
 
         const file = await File.findById(fileId);
 
-        if (!file || file.dashboard.toString() !== dashBoardId || file.folder) {
+        if (!file) {
             return res.status(404).json({message: "File not found"});
         }
 
@@ -175,6 +181,7 @@ router.delete('/:dashBoardId/file/:fileId', auth, async (req, res) => {
 
         return res.status(200).json({message: "File deleted"});
     } catch (err) {
+      console.log(err);
         return res.status(500).json({message: "Internal server error", error: err})
     }
 });
@@ -182,6 +189,7 @@ router.delete('/:dashBoardId/file/:fileId', auth, async (req, res) => {
 
 router.delete("/:dashBoardId/folder/:folderId/:fileId", auth, async (req, res) => {
     const {dashBoardId, folderId, fileId} = req.params;
+
 
     try{
         if(
@@ -192,24 +200,32 @@ router.delete("/:dashBoardId/folder/:folderId/:fileId", auth, async (req, res) =
             return res.status(400).json({message: "Invalid ID"});
         }
 
-        const folder = await Folder.findById(folderId);
+        const folder = await Folder.findById(folderId).populate('files');
 
-        if(!folder || folder.dashBoard.toString() !== dashBoardId){
+        if(!folder){
             return res.status(404).json({message: "Folder not found"});
         }
 
-        const fileIndex = folder.files.findIndex(folderFileId => folderFileId.toString() === fileId);
+        const isFileInFolder = folder.files.some(
+          (folderFile) => folderFile._id.toString() === fileId
+      );
 
-        if(fileIndex === -1) {
-            return res.status(404).json({message: "File not found in folder"});
-        }
+      if (!isFileInFolder) {
+          return res.status(404).json({ message: "File not found in folder" });
+      }
 
-        folder.files.splice(fileIndex, 1);
-        await folder.save();
 
-        await File.findByIdAndDelete(fileId);
+      folder.files = folder.files.filter(
+          (folderFile) => folderFile._id.toString() !== fileId
+      );
 
-        return res.status(200).json({message: "File deleted from folder"});
+      await folder.save();
+
+      await File.findByIdAndDelete(fileId);
+
+      const updatedFolder = await Folder.findById(folderId).populate('files');
+
+        return res.status(200).json({message: "File deleted from folder", updatedFiles: updatedFolder.files});
 
     } catch (err) {
         return res.status(500).json({message: "Internal server error", error: err})
