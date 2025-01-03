@@ -5,6 +5,8 @@ const Response = require('../schema/response.schema');
 const SharedForm = require('../schema/sharedForm.schema');
 const { auth } = require('../middlewares/auth');
 const File = require("../schema/file.schema");
+const dotenv = require('dotenv');
+dotenv.config();
 
 router.post("/save", auth, async (req, res) => {
     const { formName, elements, fileId } = req.body;
