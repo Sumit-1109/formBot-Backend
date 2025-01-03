@@ -6,18 +6,27 @@ const formElementSchema = new mongoose.Schema({
     enum: ['text', 'image', 'video', 'gif', 'inputText', 'inputEmail', 'inputPhone', 'inputDate', 'inputRating', 'inputButtons', 'inputNumber']
   },
   id: {
-    type : String,
+    type: String,
     required: true
   },
-  content: { 
-    type: String, 
+  content: {
+    type: String,
     required: false
   },
-  heading :{
+  heading: {
     type: String,
+    required: true
+  },
+  placeholder: {
+    type: String, 
+    default: ''
+  },
+  order: {
+    type: Number, 
     required: true
   }
 });
+
 
 const formSchema = new mongoose.Schema({
   formName: {
@@ -32,13 +41,7 @@ const formSchema = new mongoose.Schema({
   file: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'File',
-  },
-  sharedWith: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
-  ],
+  }
 });
 
 module.exports = mongoose.model('Form', formSchema);

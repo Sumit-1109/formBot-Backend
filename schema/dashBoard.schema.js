@@ -1,31 +1,40 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const dashBoardSchema = new mongoose.Schema({
-    name: {
+  name: {
+    type: String,
+    required: true,
+  },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  folders: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Folder",
+    },
+  ],
+  files: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "File",
+    },
+  ],
+  sharedWith: [
+    {
+      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      role: {
         type: String,
-        required: true
+        enum: ["edit", "view"],
+        default: "view",
+        required: true,
+      },
     },
-    owner: {
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "User",
-        required: true
-    },
-    folders: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Folder'
-    }],
-    files: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'File'
-    }],
-    sharedWith: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    }],
-    collaborator: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    }]
+  ],
 });
 
-module.exports = mongoose.model("Dashboard", dashBoardSchema);
+const Dashboard = mongoose.model("Dashboard", dashBoardSchema);
+
+module.exports = Dashboard;
